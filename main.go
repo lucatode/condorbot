@@ -1,3 +1,7 @@
-package condor
+package main
 
-func main(){}
+import "fmt"
+
+func main(){
+	fmt.Printf("Hello World")
+}
