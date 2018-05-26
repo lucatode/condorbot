@@ -19,9 +19,18 @@ func main(){
 	initializer := Init(os.Args)
 
 	// SETUP BOT
-	_, err := tgbotapi.NewBotAPI(initializer.GetApiToken())
+	bot, err := tgbotapi.NewBotAPI(initializer.GetApiToken())
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	// BOT CONFIG
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook(initializer.GetServerUrl() + "" + bot.Token))
+	if err != nil {
+	log.Fatal(err)
+	}
+
+
+	//port := os.Getenv("PORT")
 
 }
