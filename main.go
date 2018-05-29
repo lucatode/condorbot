@@ -14,7 +14,7 @@ func Init(args []string) initializer.Initializer {
 	if len(args) > 1 {
 		return initializer.NewInitializer(initializer.NewJsonReader(args[1]))
 	}
-	return initializer.NewInitializer(initializer.NewJsonReader("initializer.json"))
+	return initializer.NewInitializer(initializer.NewJsonReader("initializer_test.json"))
 }
 
 func NotifyChannel(w http.ResponseWriter, r *http.Request) {
