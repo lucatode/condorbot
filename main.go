@@ -34,18 +34,18 @@ func main() {
 	}
 
 	// BOT CONFIG
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(os.Getenv("ServerUrl") + "" + bot.Token))
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook(os.Getenv("ServerUrl") + bot.Token))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// SETUP INPUT ROUTES
 	port := os.Getenv("PORT")
-	port = "8080"
-	router := mux.NewRouter()
-	router.HandleFunc("/notify/{channel}", NotifyChannel).Methods("GET")
-
-	log.Fatal(http.ListenAndServe(":"+port, router))
+	// port = "8080"
+	// router := mux.NewRouter()
+	// router.HandleFunc("/notify/{channel}", NotifyChannel).Methods("GET")
+	// log.Fatal(http.ListenAndServe(":"+port, router))
+	go http.ListenAndServe(":"+port, nil)
 
 	// FETCH MESSAGES
 	updates := bot.ListenForWebhook("/" + bot.Token)
