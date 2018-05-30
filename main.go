@@ -25,16 +25,16 @@ func NotifyChannel(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 	//INIT
-	initializer := Init(os.Args)
+	//initializer := Init(os.Args)
 
 	// SETUP BOT
-	bot, err := tgbotapi.NewBotAPI(initializer.GetApiToken())
+	bot, err := tgbotapi.NewBotAPI(os.Getenv("ApiToken"))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// BOT CONFIG
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(initializer.GetServerUrl() + "" + bot.Token))
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook(os.Getenv("ServerUrl") + "" + bot.Token))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -44,6 +44,7 @@ func main() {
 	port = "8080"
 	router := mux.NewRouter()
 	router.HandleFunc("/notify/{channel}", NotifyChannel).Methods("GET")
+
 	log.Fatal(http.ListenAndServe(":"+port, router))
 
 	// FETCH MESSAGES
