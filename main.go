@@ -57,8 +57,8 @@ func main() {
 		// //  REGISTERING TO A CHANNEL
 
 		// //  REPLY TO A MESSAGE
-		msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-		bot.Send(msg)
+		//msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		//bot.Send(msg)
 	}
 
 }
