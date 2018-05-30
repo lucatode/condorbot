@@ -42,10 +42,10 @@ func main() {
 	// SETUP INPUT ROUTES
 	port := os.Getenv("PORT")
 	// port = "8080"
-	// router := mux.NewRouter()
-	// router.HandleFunc("/notify/{channel}", NotifyChannel).Methods("GET")
+	router := mux.NewRouter()
+	router.HandleFunc("/notify/{channel}", NotifyChannel).Methods("GET")
 	// log.Fatal(http.ListenAndServe(":"+port, router))
-	go http.ListenAndServe(":"+port, nil)
+	go http.ListenAndServe(":"+port, router)
 
 	// FETCH MESSAGES
 	updates := bot.ListenForWebhook("/" + bot.Token)
@@ -57,8 +57,11 @@ func main() {
 		// //  REGISTERING TO A CHANNEL
 
 		// //  REPLY TO A MESSAGE
-		//msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
-		//bot.Send(msg)
+		if update.Message.Text == "Test" {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+			bot.Send(msg)
+		}
+
 	}
 
 }
