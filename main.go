@@ -10,11 +10,8 @@ import (
 	"gopkg.in/telegram-bot-api.v4"
 )
 
-func Init(args []string) initializer.Initializer {
-	if len(args) > 1 {
-		return initializer.NewInitializer(initializer.NewJsonReader(args[1]))
-	}
-	return initializer.NewInitializer(initializer.NewJsonReader("initializer_test.json"))
+func Init() initializer.Initializer {
+	return initializer.NewInitializer(initializer.NewEnvReader())
 }
 
 func NotifyChannel(w http.ResponseWriter, r *http.Request) {
@@ -23,28 +20,32 @@ func NotifyChannel(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(message))
 }
 
+// func GetMapFromFirebase() map[string]string {
+// 	client := &http.Client{}
+// 	matchCases := repo.GetMatchCases(os.Getenv("FirebaseResponses"), client) //TODO: use initializer - "https://condorbot-c36af.firebaseio.com/responses.json" - GetServiceUrl()
+// 	return repo.MapMatchCases(matchCases)
+// }
+
 func main() {
 	//INIT
-	//initializer := Init(os.Args)
+	initializer := Init()
 
 	// SETUP BOT
-	bot, err := tgbotapi.NewBotAPI(os.Getenv("ApiToken"))
+	bot, err := tgbotapi.NewBotAPI(initializer.GetApiToken())
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// BOT CONFIG
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(os.Getenv("ServerUrl") + bot.Token))
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook(initializer.GetServerUrl() + bot.Token))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// SETUP INPUT ROUTES
 	port := os.Getenv("PORT")
-	// port = "8080"
 	router := mux.NewRouter()
 	router.HandleFunc("/notify/{channel}", NotifyChannel).Methods("GET")
-	// log.Fatal(http.ListenAndServe(":"+port, router))
 	go http.ListenAndServe(":"+port, nil)
 
 	// FETCH MESSAGES
@@ -61,7 +62,5 @@ func main() {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
 			bot.Send(msg)
 		}
-
 	}
-
 }

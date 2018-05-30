@@ -1,13 +1,24 @@
 package initializer
 
 import (
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 )
 
+func EnvVarInitializer() {
+	os.Setenv("ApiToken", "ABCD012345678")
+	os.Setenv("ServerUrl", "https://xxxxx.yyyyyy.com:443/")
+	os.Setenv("TimerSeconds", "3600")
+	os.Setenv("FirebaseResponsesUrl", "https://xxxxx.yyyyyy.com:443/")
+}
+
 func TestGetAPITocken(t *testing.T) {
-	i := NewInitializer(NewJsonReader("initializer.json"))
+
+	EnvVarInitializer()
+
+	i := NewInitializer(NewEnvReader())
 
 	token := i.GetApiToken()
 
@@ -15,7 +26,9 @@ func TestGetAPITocken(t *testing.T) {
 }
 
 func TestGetServerUrl(t *testing.T) {
-	i := NewInitializer(NewJsonReader("initializer.json"))
+	EnvVarInitializer()
+
+	i := NewInitializer(NewEnvReader())
 
 	url := i.GetServerUrl()
 
@@ -23,20 +36,11 @@ func TestGetServerUrl(t *testing.T) {
 }
 
 func TestGetTimerSeconds(t *testing.T) {
-	i := NewInitializer(NewJsonReader("initializer.json"))
+	EnvVarInitializer()
+
+	i := NewInitializer(NewEnvReader())
 
 	seconds := i.GetTimerSeconds()
 
 	assert.Equal(t, 3600, seconds, "Get URL from mocked storage")
-}
-
-func TestReadDifferentValuesFromDifferentFiles(t *testing.T) {
-	it1 := NewInitializer(NewJsonReader("initializer_test_1.json"))
-	it2 := NewInitializer(NewJsonReader("initializer_test_2.json"))
-
-	seconds1 := it1.GetTimerSeconds()
-	seconds2 := it2.GetTimerSeconds()
-
-	assert.Equal(t, 3600, seconds1, "Get URL from mocked storage")
-	assert.Equal(t, 100, seconds2, "Get URL from mocked storage")
 }

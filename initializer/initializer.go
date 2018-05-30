@@ -1,14 +1,12 @@
 package initializer
 
 import (
-	"encoding/json"
-	"io/ioutil"
-	"log"
+	"os"
 	"strconv"
 )
 
-func NewInitializer(ps InitializerStorage) *FileBasedInitializer {
-	return &FileBasedInitializer{
+func NewInitializer(ps InitializerStorage) *ParameterInitializer {
+	return &ParameterInitializer{
 		storage: ps,
 	}
 }
@@ -19,19 +17,19 @@ type Initializer interface {
 	GetTimerSeconds() int
 }
 
-type FileBasedInitializer struct {
+type ParameterInitializer struct {
 	storage InitializerStorage
 }
 
-func (init FileBasedInitializer) GetApiToken() string {
+func (init ParameterInitializer) GetApiToken() string {
 	return init.storage.GetData()["ApiToken"]
 }
 
-func (init *FileBasedInitializer) GetServerUrl() string {
+func (init ParameterInitializer) GetServerUrl() string {
 	return init.storage.GetData()["ServerUrl"]
 }
 
-func (init *FileBasedInitializer) GetTimerSeconds() int {
+func (init ParameterInitializer) GetTimerSeconds() int {
 	ret, _ := strconv.Atoi(init.storage.GetData()["TimerSeconds"])
 	return ret
 }
@@ -41,44 +39,20 @@ type InitializerStorage interface {
 	GetData() map[string]string
 }
 
-//--- Json Storage
-func NewJsonReader(path string) *JsonStorage {
-	return &JsonStorage{"", path}
+//--- Env Storage
+func NewEnvReader() *EnvStorage {
+	return &EnvStorage{""}
 }
 
-type JsonStorage struct {
-	storageType string
-	path        string
-}
-
-func (storage JsonStorage) GetData() map[string]string {
-	content, err := ioutil.ReadFile(storage.path)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	jsonMap := make(map[string]string)
-	err = json.Unmarshal([]byte(content), &jsonMap)
-	if err != nil {
-		panic(err)
-	}
-
-	return jsonMap
-}
-
-//--- Mocked Storage
-func NewMockedReader() *MockedStorage {
-	return &MockedStorage{""}
-}
-
-type MockedStorage struct {
+type EnvStorage struct {
 	storageType string
 }
 
-func (storage MockedStorage) GetData() map[string]string {
+func (storage EnvStorage) GetData() map[string]string {
 	return map[string]string{
-		"ApiToken":     "ABCD012345678",
-		"ServerUrl":    "https://xxxxx.yyyyyy.com:443/",
-		"TimerSeconds": "3600",
+		"ApiToken":             os.Getenv("ApiToken"),
+		"ServerUrl":            os.Getenv("ServerUrl"),
+		"TimerSeconds":         os.Getenv("TimerSeconds"),
+		"FirebaseResponsesUrl": os.Getenv("FirebaseResponsesUrl"),
 	}
 }
