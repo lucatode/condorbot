@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"encoding/json"
 	"condorbot/logger"
-	"strings"
 	"strconv"
 )
 
