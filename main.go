@@ -10,6 +10,7 @@ import (
 	"condorbot/parser"
 	"condorbot/repositories"
 	"condorbot/logger"
+	"strings"
 )
 
 func Init() initializer.Initializer {
@@ -56,8 +57,9 @@ func main() {
 	logger.Log("MAIN", "port: "+port)
 	go http.ListenAndServe(":"+port, nil)
 
-	http.HandleFunc("/notify", func(w http.ResponseWriter, r *http.Request) {
-		logger.Log("MAIN", "call notify chan")
+	http.HandleFunc("/notify/", func(w http.ResponseWriter, r *http.Request) {
+		channel := strings.TrimPrefix(r.URL.Path, "/notify/")
+		logger.Log("MAIN", "call notify chan: "+channel)
 	})
 
 	// FETCH MESSAGES
