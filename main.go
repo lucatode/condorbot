@@ -10,6 +10,7 @@ import (
 	"gopkg.in/telegram-bot-api.v4"
 	"condorbot/parser"
 	"condorbot/repositories"
+	logger2 "condorbot/logger"
 )
 
 func Init() initializer.Initializer {
@@ -26,7 +27,8 @@ func main() {
 	//INIT
 	init := Init()
 	client := http.Client{}
-	repo := repositories.FireBaseRepository{client.Get}
+	logger := logger2.FirebaseLogger{init.GetFireBaseLogsUrl()}
+	repo := repositories.FireBaseRepository{client.Get, logger}
 	parser := parser.NewExactMatcher(repo.GetExactMatchMap(init.GetFireBaseResponsesUrl()))
 
 	// SETUP BOT

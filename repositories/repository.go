@@ -4,6 +4,9 @@ import (
 	"io/ioutil"
 	"net/http"
 	"encoding/json"
+	"condorbot/logger"
+	"strings"
+	"strconv"
 )
 
 type Repository interface{
@@ -12,12 +15,13 @@ type Repository interface{
 
 type FireBaseRepository struct{
 	Delegate func (string) (*http.Response, error)
+	Logger logger.Logger
 }
 
 func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
 	resp, err := repo.Delegate(url)
 	if err != nil {
-		// err
+		repo.Logger.Err("FireBaseRepository", err.Error())
 	}
 	defer resp.Body.Close()
 
@@ -25,14 +29,29 @@ func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
 	if resp.StatusCode == http.StatusOK {
 		bytesArray, err = ioutil.ReadAll(resp.Body)
 		if err != nil{
-			//err
+			repo.Logger.Err("FireBaseRepository", err.Error())
 		}
 	}
 
 	if bytesArray != nil{
 		var cases []MatchCase
 		json.Unmarshal(bytesArray, &cases)
-		return MatchCasesToMap(cases)
+		for _, e := range cases {
+			repo.Logger.Log("FireBaseRepository", "Loaded: "+e.Request)
+		}
+
+		dict := make(map[string]string)
+		for _,matchCase := range cases {
+			if matchCase.MatchExact {
+				dict[matchCase.Request] = matchCase.Response
+				repo.Logger.Log("FireBaseRepository", "To Map: "+matchCase.Request)
+			}
+		}
+
+		l := len(dict)
+		repo.Logger.Log("FireBaseRepository", "Dict created len: "+strconv.Itoa(l))
+		return dict
+
 	}
 
 	return nil

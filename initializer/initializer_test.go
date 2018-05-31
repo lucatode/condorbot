@@ -12,6 +12,7 @@ func EnvVarInitializer() {
 	os.Setenv("ServerUrl", "https://xxxxx.yyyyyy.com:443/")
 	os.Setenv("TimerSeconds", "3600")
 	os.Setenv("FireBaseResponsesUrl", "https://xxxxx.firebase.com:443/")
+	os.Setenv("FireBaseLogsUrl", "https://xxxxx.firebase.com:443/logs")
 }
 
 func TestGetAPITocken(t *testing.T) {
@@ -43,6 +44,16 @@ func TestGetFireBaseResponsesUrl(t *testing.T) {
 	url := i.GetFireBaseResponsesUrl()
 
 	assert.Equal(t, "https://xxxxx.firebase.com:443/", url, "Get URL from mocked storage")
+}
+
+func TestGetFireBaseLogsUrl(t *testing.T) {
+	EnvVarInitializer()
+
+	i := NewInitializer(NewEnvReader())
+
+	url := i.GetFireBaseLogsUrl()
+
+	assert.Equal(t, "https://xxxxx.firebase.com:443/logs", url, "Get URL from mocked storage")
 }
 
 
