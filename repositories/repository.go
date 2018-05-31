@@ -20,7 +20,7 @@ type FireBaseRepository struct{
 func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
 	resp, err := repo.Delegate(url)
 	if err != nil {
-		repo.Logger.Err("FireBaseRepository", err.Error())
+		repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
 	}
 	defer resp.Body.Close()
 
@@ -28,7 +28,7 @@ func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
 	if resp.StatusCode == http.StatusOK {
 		bytesArray, err = ioutil.ReadAll(resp.Body)
 		if err != nil{
-			repo.Logger.Err("FireBaseRepository", err.Error())
+			repo.Logger.Err("FireBaseRepository", "Second err: "+err.Error())
 		}
 	}
 
