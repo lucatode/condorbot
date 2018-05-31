@@ -18,14 +18,9 @@ type FireBaseRepository struct{
 }
 
 func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
-	req, err := http.NewRequest("GET", url, nil)
-	//req.Header.Set("X-Custom-Header", "log")
-	//req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
+	resp, err := repo.Delegate(url)
 	if err != nil {
-		repo.Logger.Err("FireBaseRepository", url+", First err: "+err.Error())
+		repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
 	}
 	defer resp.Body.Close()
 
@@ -33,7 +28,7 @@ func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
 	if resp.StatusCode == http.StatusOK {
 		bytesArray, err = ioutil.ReadAll(resp.Body)
 		if err != nil{
-			repo.Logger.Err("FireBaseRepository", "Second err: "+err.Error())
+			repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
 		}
 	}
 
