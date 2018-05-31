@@ -57,7 +57,7 @@ func main() {
 	port := os.Getenv("PORT")
 	router := mux.NewRouter()
 	router.HandleFunc("/notify/{channel}", NotifyChannel).Methods("GET")
-	go http.ListenAndServe(":"+port, nil)
+	go http.ListenAndServe(":"+port, router)
 
 	// FETCH MESSAGES
 	updates := bot.ListenForWebhook("/" + bot.Token)
