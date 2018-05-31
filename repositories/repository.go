@@ -19,13 +19,13 @@ type FireBaseRepository struct{
 
 func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
 	req, err := http.NewRequest("GET", url, nil)
-	req.Header.Set("X-Custom-Header", "log")
-	req.Header.Set("Content-Type", "application/json")
+	//req.Header.Set("X-Custom-Header", "log")
+	//req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
 	if err != nil {
-		repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
+		repo.Logger.Err("FireBaseRepository", url+", First err: "+err.Error())
 	}
 	defer resp.Body.Close()
 
