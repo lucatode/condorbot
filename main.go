@@ -17,11 +17,6 @@ func Init() initializer.Initializer {
 	return initializer.NewInitializer(initializer.NewEnvReader())
 }
 
-func NotifyChannel(w http.ResponseWriter, r *http.Request) {
-	message := "Notifing channel: "
-	w.Write([]byte(message))
-}
-
 func CreateLogger(init initializer.Initializer) logger.FirebaseLogger {
 	logger := logger.FirebaseLogger{init.GetFireBaseLogsUrl()}
 	logger.Log("MAIN", "Starting")
@@ -38,7 +33,11 @@ func main() {
 	init := Init()
 	logger := CreateLogger(init)
 	repo := CreateRepository(logger)
-	parser := parser.NewExactMatcher(repo.GetExactMatchMap(init.GetFireBaseResponsesUrl()))
+	parser := parser.ContainsWordDecorated(
+		repo.GetWordMatchMap(init.GetFireBaseResponsesUrl()),
+		parser.NewExactMatcher(
+			repo.GetExactMatchMap(init.GetFireBaseResponsesUrl(),
+			)))
 
 	// SETUP BOT
 	bot, err := tgbotapi.NewBotAPI(init.GetApiToken())
