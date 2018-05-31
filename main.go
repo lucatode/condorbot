@@ -28,6 +28,7 @@ func main() {
 	init := Init()
 	client := http.Client{}
 	logger := logger.FirebaseLogger{init.GetFireBaseLogsUrl()}
+	logger.Log("MAIN", "Starting")
 	repo := repositories.FireBaseRepository{client.Get, logger}
 	parser := parser.NewExactMatcher(repo.GetExactMatchMap(init.GetFireBaseResponsesUrl()))
 
