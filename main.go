@@ -56,8 +56,8 @@ func main() {
 	logger.Log("MAIN", "port: "+port)
 	go http.ListenAndServe(":"+port, nil)
 
-	http.HandleFunc("/notify/{channel}", func(w http.ResponseWriter, r *http.Request) {
-		NotifyChannel(w,r)
+	http.HandleFunc("/notify", func(w http.ResponseWriter, r *http.Request) {
+		logger.Log("MAIN", "call notify chan")
 	})
 
 	// FETCH MESSAGES
