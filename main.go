@@ -6,7 +6,6 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/gorilla/mux"
 	"gopkg.in/telegram-bot-api.v4"
 	"condorbot/parser"
 	"condorbot/repositories"
@@ -18,8 +17,7 @@ func Init() initializer.Initializer {
 }
 
 func NotifyChannel(w http.ResponseWriter, r *http.Request) {
-	params := mux.Vars(r)
-	message := "Notifing channel: " + params["channel"]
+	message := "Notifing channel: "
 	w.Write([]byte(message))
 }
 
@@ -55,11 +53,11 @@ func main() {
 
 	// SETUP INPUT ROUTES
 	port := os.Getenv("PORT")
-	logger.Log("MAIN", "Using port: "+port)
-	router := mux.NewRouter()
-	router.HandleFunc("/notify/{channel}", NotifyChannel).Methods("GET")
 	go http.ListenAndServe(":"+port, nil)
 
+	http.HandleFunc("/notify/{channel}", func(w http.ResponseWriter, r *http.Request) {
+		NotifyChannel(w,r)
+	})
 
 	// FETCH MESSAGES
 	updates := bot.ListenForWebhook("/" + bot.Token)
