@@ -15,6 +15,7 @@ type Initializer interface {
 	GetApiToken() string
 	GetServerUrl() string
 	GetTimerSeconds() int
+	GetFireBaseResponsesUrl() string
 }
 
 type ParameterInitializer struct {
@@ -32,6 +33,10 @@ func (init ParameterInitializer) GetServerUrl() string {
 func (init ParameterInitializer) GetTimerSeconds() int {
 	ret, _ := strconv.Atoi(init.storage.GetData()["TimerSeconds"])
 	return ret
+}
+
+func (init ParameterInitializer) GetFireBaseResponsesUrl() string {
+	return init.storage.GetData()["FireBaseResponsesUrl"]
 }
 
 //--- Initializer Storage
@@ -53,6 +58,6 @@ func (storage EnvStorage) GetData() map[string]string {
 		"ApiToken":             os.Getenv("ApiToken"),
 		"ServerUrl":            os.Getenv("ServerUrl"),
 		"TimerSeconds":         os.Getenv("TimerSeconds"),
-		"FirebaseResponsesUrl": os.Getenv("FirebaseResponsesUrl"),
+		"FireBaseResponsesUrl": os.Getenv("FirebaseResponsesUrl"),
 	}
 }

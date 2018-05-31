@@ -8,6 +8,8 @@ import (
 
 	"github.com/gorilla/mux"
 	"gopkg.in/telegram-bot-api.v4"
+	"condorbot/parser"
+	"condorbot/repositories"
 )
 
 func Init() initializer.Initializer {
@@ -20,24 +22,21 @@ func NotifyChannel(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(message))
 }
 
-// func GetMapFromFirebase() map[string]string {
-// 	client := &http.Client{}
-// 	matchCases := repo.GetMatchCases(os.Getenv("FirebaseResponses"), client) //TODO: use initializer - "https://condorbot-c36af.firebaseio.com/responses.json" - GetServiceUrl()
-// 	return repo.MapMatchCases(matchCases)
-// }
-
 func main() {
 	//INIT
-	initializer := Init()
+	init := Init()
+	client := http.Client{}
+	repo := repositories.FireBaseRepository{client.Get}
+	parser := parser.NewExactMatcher(repo.GetExactMatchMap(init.GetFireBaseResponsesUrl()))
 
 	// SETUP BOT
-	bot, err := tgbotapi.NewBotAPI(initializer.GetApiToken())
+	bot, err := tgbotapi.NewBotAPI(init.GetApiToken())
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	// BOT CONFIG
-	_, err = bot.SetWebhook(tgbotapi.NewWebhook(initializer.GetServerUrl() + bot.Token))
+	_, err = bot.SetWebhook(tgbotapi.NewWebhook(init.GetServerUrl() + bot.Token))
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -55,11 +54,10 @@ func main() {
 			continue
 		}
 
-		// //  REGISTERING TO A CHANNEL
+		ok,resp := parser.MatchString(update.Message.Text)
 
-		// //  REPLY TO A MESSAGE
-		if update.Message.Text == "Test" {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, update.Message.Text)
+		if ok {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, resp)
 			bot.Send(msg)
 		}
 	}
