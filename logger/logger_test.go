@@ -1,5 +1,5 @@
 package logger
-//
+
 //import (
 //	"testing"
 //)

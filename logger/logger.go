@@ -2,9 +2,9 @@ package logger
 
 import (
 	"net/http"
-	"github.com/gin-gonic/gin/json"
 	"bytes"
 	"time"
+	"encoding/json"
 )
 
 type Log struct{
