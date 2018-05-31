@@ -17,11 +17,11 @@ func Init() initializer.Initializer {
 	return initializer.NewInitializer(initializer.NewEnvReader())
 }
 
-//func NotifyChannel(w http.ResponseWriter, r *http.Request) {
-//	params := mux.Vars(r)
-//	message := "Notifing channel: " + params["channel"]
-//	w.Write([]byte(message))
-//}
+func NotifyChannel(w http.ResponseWriter, r *http.Request) {
+	params := mux.Vars(r)
+	message := "Notifing channel: " + params["channel"]
+	w.Write([]byte(message))
+}
 
 func CreateLogger(init initializer.Initializer) logger.FirebaseLogger {
 	logger := logger.FirebaseLogger{init.GetFireBaseLogsUrl()}
@@ -55,8 +55,8 @@ func main() {
 
 	// SETUP INPUT ROUTES
 	port := os.Getenv("PORT")
-	//router := mux.NewRouter()
-	//router.HandleFunc("/notify/{channel}", NotifyChannel).Methods("GET")
+	router := mux.NewRouter()
+	router.HandleFunc("/notify/{channel}", NotifyChannel).Methods("GET")
 	go http.ListenAndServe(":"+port, nil)
 
 	// FETCH MESSAGES
