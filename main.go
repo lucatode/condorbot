@@ -53,6 +53,7 @@ func main() {
 
 	// SETUP INPUT ROUTES
 	port := os.Getenv("PORT")
+	logger.Log("MAIN", "port: "+port)
 	go http.ListenAndServe(":"+port, nil)
 
 	http.HandleFunc("/notify/{channel}", func(w http.ResponseWriter, r *http.Request) {
