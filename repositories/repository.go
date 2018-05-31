@@ -11,11 +11,11 @@ type Repository interface{
 }
 
 type FireBaseRepository struct{
-	delegate func (string) (*http.Response, error)
+	Delegate func (string) (*http.Response, error)
 }
 
 func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
-	resp, err := repo.delegate(url)
+	resp, err := repo.Delegate(url)
 	if err != nil {
 		// err
 	}
