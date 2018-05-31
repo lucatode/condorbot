@@ -54,10 +54,10 @@ func main() {
 			continue
 		}
 
-		ok,resp := parser.MatchString(update.Message.Text)
+		ok,_ := parser.MatchString(update.Message.Text)
 
 		if ok {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, resp)
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, "Found")
 			bot.Send(msg)
 		}
 	}

@@ -66,7 +66,7 @@ func TestExactMatchDecorated(t *testing.T) {
 	matchOutput, stringOutput = ContainsWordDecorated(
 		MockWordMatcherDictionary(),
 		NewExactMatcher(MockExactMatchDictionary(),
-			)).MatchString("#notify")
+			)).MatchString("notify")
 	assert.Equal(t,"notified", stringOutput,  "Getting specific string")
 	assert.Equal(t, matchOutput, true, "Getting specific match bool")
 }
