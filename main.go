@@ -58,7 +58,6 @@ func main() {
 	logger.Log("MAIN", "Using port: "+port)
 	router := mux.NewRouter()
 	router.HandleFunc("/notify/{channel}", NotifyChannel).Methods("GET")
-	go http.ListenAndServe(":8080", router)
 	go http.ListenAndServe(":"+port, nil)
 
 
