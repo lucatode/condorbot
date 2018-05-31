@@ -18,7 +18,8 @@ type FireBaseRepository struct{
 }
 
 func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
-	resp, err := repo.Delegate(url)
+	client:= http.Client{}
+	resp, err := client.Get(url)
 	if err != nil {
 		repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
 	}

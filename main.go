@@ -27,9 +27,10 @@ func main() {
 	//INIT
 	init := Init()
 	client := http.Client{}
+	getFunc := client.Get
 	logger := logger.FirebaseLogger{init.GetFireBaseLogsUrl()}
 	logger.Log("MAIN", "Starting")
-	repo := repositories.FireBaseRepository{client.Get, logger}
+	repo := repositories.FireBaseRepository{getFunc, logger}
 	parser := parser.NewExactMatcher(repo.GetExactMatchMap(init.GetFireBaseResponsesUrl()))
 
 	// SETUP BOT
