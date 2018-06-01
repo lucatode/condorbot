@@ -71,7 +71,6 @@ func NewCommandsMatcher(dispacher dispacher.Dispacher) Parser {
 	return CommandsMatcher{delegate, dispacher}
 }
 
-//
-//func CommandsDecorated( dict map[string]string, matcher Parser) Parser {
-//	return CommandsMatcher{matcher.MatchString,dict}
-//}
+func CommandsDecorated(dispacher dispacher.Dispacher, matcher Parser) Parser {
+	return CommandsMatcher{matcher.MatchString, dispacher}
+}
