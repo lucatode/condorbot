@@ -1,16 +1,18 @@
 package main
 
 import (
+	"condorbot/dispacher"
 	"condorbot/initializer"
 	"log"
 	"net/http"
 	"os"
 
-	"gopkg.in/telegram-bot-api.v4"
+	"condorbot/logger"
 	"condorbot/parser"
 	"condorbot/repositories"
-	"condorbot/logger"
 	"strings"
+
+	"gopkg.in/telegram-bot-api.v4"
 )
 
 func Init() initializer.Initializer {
@@ -28,16 +30,24 @@ func CreateRepository(logger logger.FirebaseLogger) repositories.FireBaseReposit
 	return repositories.FireBaseRepository{client.Get, logger}
 }
 
+func BuildCommandDispacher() dispacher.Dispacher {
+	return dispacher.CommandDispacher{map[string]func([]string) string{
+		"#register": func(split []string) string { return "" },
+	}}
+}
+
 func main() {
 	//INIT
 	init := Init()
 	logger := CreateLogger(init)
 	repo := CreateRepository(logger)
-	parser := parser.ContainsWordDecorated(
-		repo.GetWordMatchMap(init.GetFireBaseResponsesUrl()),
-		parser.NewExactMatcher(
-			repo.GetExactMatchMap(init.GetFireBaseResponsesUrl(),
-			)))
+
+	parser := parser.CommandsDecorated(
+		BuildCommandDispacher(),
+		parser.ContainsWordDecorated(
+			repo.GetWordMatchMap(init.GetFireBaseResponsesUrl()),
+			parser.NewExactMatcher(
+				repo.GetExactMatchMap(init.GetFireBaseResponsesUrl()))))
 
 	// SETUP BOT
 	bot, err := tgbotapi.NewBotAPI(init.GetApiToken())
@@ -76,5 +86,3 @@ func main() {
 		}
 	}
 }
-
-

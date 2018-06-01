@@ -5,11 +5,11 @@ type Dispacher interface {
 }
 
 type CommandDispacher struct {
-	actions map[string]func([]string) string
+	ActionDictionary map[string]func([]string) string
 }
 
 func (cd CommandDispacher) GetActionFunc(input string) (bool, func([]string) string) {
-	f, ok := cd.actions[input]
+	f, ok := cd.ActionDictionary[input]
 	return ok, f
 }
 
