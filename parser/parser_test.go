@@ -4,7 +4,7 @@ import (
 	"condorbot/dispacher"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
+	"githuB.com/stretchr/testify/assert"
 )
 
 func MockExactMatchDictionary() map[string]string {
@@ -35,49 +35,55 @@ func MockDispacher() dispacher.Dispacher {
 		}})
 }
 
+var B = NewMessageBuilder()
+
+////////////////////////
 func TestExactMatchDecoratedWithCommand(t *testing.T) {
 
 	matcher := CommandsDecorated(
 		MockDispacher(),
 		NewExactMatcher(MockExactMatchDictionary()),
 	)
-	matchOutput, stringOutput := matcher.MatchString("notify")
+
+	matchOutput, stringOutput := matcher.ParseMessage(B.WithText("notify").Build())
 	assert.Equal(t, "notified", stringOutput, "")
 	assert.Equal(t, matchOutput, true, "")
 
-	matchOutput, stringOutput = matcher.MatchString("#command")
+	matchOutput, stringOutput = matcher.ParseMessage(B.WithText("#command").Build())
 	assert.Equal(t, "command received", stringOutput, "")
 	assert.Equal(t, matchOutput, true, "")
 }
 
 func TestCheckCommandMatch(t *testing.T) {
-	matchOutput, stringOutput := NewCommandsMatcher(MockDispacher()).MatchString("#command")
+
+	matchOutput, stringOutput := NewCommandsMatcher(MockDispacher()).ParseMessage(B.WithText("#command").Build())
 	assert.Equal(t, stringOutput, "command received", "")
 	assert.Equal(t, matchOutput, true, "")
 }
 
-func TestCommandParameters(t *testing.T) {
-	matchOutput, stringOutput := NewCommandsMatcher(MockDispacher()).MatchString("#subscribe_2 channel xxxx")
+func TestCommandWithParameters(t *testing.T) {
+
+	matchOutput, stringOutput := NewCommandsMatcher(MockDispacher()).ParseMessage(B.WithText("#subscribe_2 channel xxxx").Build())
 	assert.Equal(t, stringOutput, "subscribed channel xxxx", "")
 	assert.Equal(t, matchOutput, true, "")
 }
 
 func TestCheckStringMatch(t *testing.T) {
-	matchOutput, stringOutput := NewExactMatcher(MockExactMatchDictionary()).MatchString("notify")
+	matchOutput, stringOutput := NewExactMatcher(MockExactMatchDictionary()).ParseMessage(B.WithText("notify").Build())
 	assert.Equal(t, stringOutput, "notified", "")
 	assert.Equal(t, matchOutput, true, "")
 }
 
 func TestContainsWordMatch(t *testing.T) {
-	matchOutput, stringOutput := NewContainsWordMatcher(MockWordMatcherDictionary()).MatchString("abba abab ababa")
+	matchOutput, stringOutput := NewContainsWordMatcher(MockWordMatcherDictionary()).ParseMessage(B.WithText("abba abab ababa").Build())
 	assert.Equal(t, "Found abba", stringOutput, "")
 	assert.Equal(t, matchOutput, true, "")
 
-	matchOutput, stringOutput = NewContainsWordMatcher(MockWordMatcherDictionary()).MatchString("aaaa bccb")
+	matchOutput, stringOutput = NewContainsWordMatcher(MockWordMatcherDictionary()).ParseMessage(B.WithText("aaaa bccb").Build())
 	assert.Equal(t, "Found bccb", stringOutput, "")
 	assert.Equal(t, matchOutput, true, "")
 
-	matchOutput, stringOutput = NewContainsWordMatcher(MockWordMatcherDictionary()).MatchString("cddc")
+	matchOutput, stringOutput = NewContainsWordMatcher(MockWordMatcherDictionary()).ParseMessage(B.WithText("cddc").Build())
 	assert.Equal(t, "", stringOutput, "")
 	assert.Equal(t, matchOutput, false, "")
 }
@@ -88,13 +94,32 @@ func TestExactMatchDecorated(t *testing.T) {
 		MockWordMatcherDictionary(),
 		NewExactMatcher(MockExactMatchDictionary()),
 	)
-	matchOutput, stringOutput := matcher.MatchString("aaaa bccb")
+	matchOutput, stringOutput := matcher.ParseMessage(B.WithText("aaaa bccb").Build())
 	assert.Equal(t, "Found bccb", stringOutput, "")
 	assert.Equal(t, matchOutput, true, "")
 
 	matchOutput, stringOutput = ContainsWordDecorated(
 		MockWordMatcherDictionary(),
-		NewExactMatcher(MockExactMatchDictionary())).MatchString("notify")
+		NewExactMatcher(MockExactMatchDictionary())).ParseMessage(B.WithText("notify").Build())
 	assert.Equal(t, "notified", stringOutput, "")
 	assert.Equal(t, matchOutput, true, "")
+}
+
+//////////////////////////////////
+
+type Builder interface {
+	Build() Message
+}
+
+type MessageBuilder struct {
+	text   string
+	chatId string
+}
+
+func (b MessageBuilder) WithText(t string) MessageBuilder   { b.text = t; return b }
+func (b MessageBuilder) WithChatId(i string) MessageBuilder { b.chatId = i; return b }
+func (b MessageBuilder) Build() Message                     { return Message{b.text, b.chatId} }
+
+func NewMessageBuilder() MessageBuilder {
+	return MessageBuilder{}
 }

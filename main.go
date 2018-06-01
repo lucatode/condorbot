@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	"condorbot/logger"
 	"condorbot/parser"
@@ -32,8 +33,11 @@ func CreateRepository(logger logger.FirebaseLogger) repositories.FireBaseReposit
 
 func BuildCommandDispacher() dispacher.Dispacher {
 	return dispacher.CommandDispacher{map[string]func([]string) string{
-		"#register": func(split []string) string { return "" },
+		"#subscribe": func(split []string) string { return "" }, //adding chatid to specific channel
 	}}
+}
+func BuildMessage(message *tgbotapi.Message) parser.Message {
+	return parser.Message{message.Text, strconv.FormatInt(message.Chat.ID, 10)}
 }
 
 func main() {
@@ -42,7 +46,7 @@ func main() {
 	logger := CreateLogger(init)
 	repo := CreateRepository(logger)
 
-	parser := parser.CommandsDecorated(
+	p := parser.CommandsDecorated(
 		BuildCommandDispacher(),
 		parser.ContainsWordDecorated(
 			repo.GetWordMatchMap(init.GetFireBaseResponsesUrl()),
@@ -78,7 +82,7 @@ func main() {
 			continue
 		}
 
-		ok, text := parser.MatchString(update.Message.Text)
+		ok, text := p.ParseMessage(BuildMessage(update.Message))
 
 		if ok {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
