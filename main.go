@@ -19,21 +19,18 @@ import (
 func Init() initializer.Initializer {
 	return initializer.NewInitializer(initializer.NewEnvReader())
 }
-
 func CreateLogger(init initializer.Initializer) logger.FirebaseLogger {
 	logger := logger.FirebaseLogger{init.GetFireBaseLogsUrl()}
 	logger.Log("MAIN", "Starting")
 	return logger
 }
-
 func CreateRepository(logger logger.FirebaseLogger) repositories.FireBaseRepository {
 	client := http.Client{}
 	return repositories.FireBaseRepository{client.Get, logger}
 }
-
 func BuildCommandDispacher() dispacher.Dispacher {
 	return dispacher.CommandDispacher{map[string]func([]string) string{
-		"#subscribe": func(split []string) string { return "" }, //adding chatid to specific channel
+		"#subscribe": func(split []string) string { return "channel subscribed" },
 	}}
 }
 func BuildMessage(message *tgbotapi.Message) parser.Message {
