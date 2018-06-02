@@ -61,6 +61,7 @@ func main() {
 	_, err = bot.SetWebhook(tgbotapi.NewWebhook(init.GetServerUrl() + bot.Token))
 	if err != nil {
 		log.Fatal(err)
+
 	}
 
 	// SETUP INPUT ROUTES
@@ -70,7 +71,14 @@ func main() {
 
 	http.HandleFunc("/notify/", func(w http.ResponseWriter, r *http.Request) {
 		channel := strings.TrimPrefix(r.URL.Path, "/notify/")
-		logger.Log("MAIN", "call notify chan: "+channel)
+		channelsToNotify := subscriber.GetChatIdForChannel(init.GetFireBaseSubscriptionsUrl(), channel)
+
+		for _, c := range channelsToNotify {
+			i, _ := strconv.ParseInt(c, 10, 64)
+			msg := tgbotapi.NewMessage(i, "notifing channel "+channel)
+			bot.Send(msg)
+		}
+
 	})
 
 	// FETCH MESSAGES
