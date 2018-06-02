@@ -4,6 +4,8 @@ import (
 	"condorbot/dispacher"
 	"condorbot/initializer"
 	"condorbot/subscriber"
+	"encoding/json"
+	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -73,9 +75,28 @@ func main() {
 		channel := strings.TrimPrefix(r.URL.Path, "/notify/")
 		channelsToNotify := subscriber.GetChatIdForChannel(init.GetFireBaseSubscriptionsUrl(), channel)
 
+		type NotificationMessage struct {
+			Source  string
+			Message string
+		}
+
+		var mex NotificationMessage
+
+		if r.Method == "POST" {
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, "Error reading request body",
+					http.StatusInternalServerError)
+			}
+
+			if body != nil {
+				json.Unmarshal(body, &mex)
+			}
+		}
+
 		for _, c := range channelsToNotify {
 			i, _ := strconv.ParseInt(c, 10, 64)
-			msg := tgbotapi.NewMessage(i, "notifing channel "+channel)
+			msg := tgbotapi.NewMessage(i, "["+mex.Source+"]: "+mex.Message)
 			bot.Send(msg)
 		}
 
