@@ -71,11 +71,31 @@ func main() {
 	logger.Log("MAIN", "port: "+port)
 	go http.ListenAndServe(":"+port, nil)
 
-	http.HandleFunc("/notify/", func(w http.ResponseWriter, r *http.Request) {
+	http.HandleFunc("/notify/", NotifyHandler(init, bot))
+
+	// FETCH MESSAGES
+	updates := bot.ListenForWebhook("/" + bot.Token)
+	for update := range updates {
+		if update.Message == nil {
+			continue
+		}
+
+		ok, text := p.ParseMessage(BuildMessage(update.Message))
+
+		if ok {
+			msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
+			bot.Send(msg)
+		}
+	}
+}
+
+func NotifyHandler(init initializer.Initializer, bot *tgbotapi.BotAPI) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
 		channel := strings.TrimPrefix(r.URL.Path, "/notify/")
 		channelsToNotify := subscriber.GetChatIdForChannel(init.GetFireBaseSubscriptionsUrl(), channel)
 
 		type NotificationMessage struct {
+			Key string
 			Source  string
 			Message string
 		}
@@ -94,26 +114,12 @@ func main() {
 			}
 		}
 
-		for _, c := range channelsToNotify {
-			i, _ := strconv.ParseInt(c, 10, 64)
-			msg := tgbotapi.NewMessage(i, "["+mex.Source+"]: "+mex.Message)
-			bot.Send(msg)
-		}
-
-	})
-
-	// FETCH MESSAGES
-	updates := bot.ListenForWebhook("/" + bot.Token)
-	for update := range updates {
-		if update.Message == nil {
-			continue
-		}
-
-		ok, text := p.ParseMessage(BuildMessage(update.Message))
-
-		if ok {
-			msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
-			bot.Send(msg)
+		if mex.Key == os.Getenv("SecuriyKey") {
+			for _, c := range channelsToNotify {
+				i, _ := strconv.ParseInt(c, 10, 64)
+				msg := tgbotapi.NewMessage(i, "["+mex.Source+"]: "+mex.Message)
+				bot.Send(msg)
+			}
 		}
 	}
 }

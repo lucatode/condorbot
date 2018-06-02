@@ -22,9 +22,9 @@ func MockWordMatcherDictionary() map[string]string {
 }
 
 func MockDispacher() dispacher.Dispacher {
-	return dispacher.NewCommandDispacher(map[string]func([]string) string{
-		"#command": func([]string) string { return "command received" },
-		"#subscribe_2": func(params []string) string {
+	return dispacher.NewCommandDispacher(map[string]func([]string, string) string{
+		"#command": func([]string, string) string { return "command received" },
+		"#subscribe_2": func(params []string, chatId string) string {
 			msg := "subscribed"
 			for i, p := range params {
 				if i > 0 {
