@@ -3,6 +3,7 @@ package main
 import (
 	"condorbot/dispacher"
 	"condorbot/initializer"
+	"condorbot/subscriber"
 	"log"
 	"net/http"
 	"os"
@@ -28,13 +29,13 @@ func CreateRepository(logger logger.FirebaseLogger) repositories.FireBaseReposit
 	client := http.Client{}
 	return repositories.FireBaseRepository{client.Get, logger}
 }
-func BuildCommandDispacher() dispacher.Dispacher {
-	return dispacher.CommandDispacher{map[string]func([]string) string{
-		"#subscribe": func(split []string) string { return "channel subscribed" },
-	}}
-}
 func BuildMessage(message *tgbotapi.Message) parser.Message {
 	return parser.Message{message.Text, strconv.FormatInt(message.Chat.ID, 10)}
+}
+func BuildCommandDispacher(url string) dispacher.Dispacher {
+	return dispacher.CommandDispacher{map[string]func([]string, string) string{
+		"#subscribe": func(split []string, chatId string) string { return subscriber.AddSubscription(url, split, chatId) },
+	}}
 }
 
 func main() {
@@ -44,7 +45,7 @@ func main() {
 	repo := CreateRepository(logger)
 
 	p := parser.CommandsDecorated(
-		BuildCommandDispacher(),
+		BuildCommandDispacher(init.GetFireBaseSubscriptionsUrl()),
 		parser.ContainsWordDecorated(
 			repo.GetWordMatchMap(init.GetFireBaseResponsesUrl()),
 			parser.NewExactMatcher(

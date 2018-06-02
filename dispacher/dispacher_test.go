@@ -8,9 +8,9 @@ import (
 )
 
 func NewMockedCommandDispacher() Dispacher {
-	return CommandDispacher{map[string]func([]string) string{
-		"#subscribe": func([]string) string { return "subscribed" },
-		"#subscribe_2": func(params []string) string {
+	return CommandDispacher{map[string]func([]string, string) string{
+		"#subscribe": func([]string, string) string { return "subscribed" },
+		"#subscribe_2": func(params []string, chatId string) string {
 			msg := "subscribed"
 			for i, p := range params {
 				if i > 0 {

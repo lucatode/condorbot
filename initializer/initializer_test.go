@@ -13,6 +13,7 @@ func EnvVarInitializer() {
 	os.Setenv("TimerSeconds", "3600")
 	os.Setenv("FireBaseResponsesUrl", "https://xxxxx.firebase.com:443/")
 	os.Setenv("FireBaseLogsUrl", "https://xxxxx.firebase.com:443/logs")
+	os.Setenv("FireBaseSubscriptionsUrl", "https://xxxxx.firebase.com:443/subscriptions")
 }
 
 func TestGetAPITocken(t *testing.T) {
@@ -33,7 +34,7 @@ func TestGetServerUrl(t *testing.T) {
 
 	url := i.GetServerUrl()
 
-	assert.Equal(t, "https://xxxxx.yyyyyy.com:443/", url, "Get URL from mocked storage")
+	assert.Equal(t, "https://xxxxx.yyyyyy.com:443/", url, "")
 }
 
 func TestGetFireBaseResponsesUrl(t *testing.T) {
@@ -43,7 +44,7 @@ func TestGetFireBaseResponsesUrl(t *testing.T) {
 
 	url := i.GetFireBaseResponsesUrl()
 
-	assert.Equal(t, "https://xxxxx.firebase.com:443/", url, "Get URL from mocked storage")
+	assert.Equal(t, "https://xxxxx.firebase.com:443/", url, "")
 }
 
 func TestGetFireBaseLogsUrl(t *testing.T) {
@@ -53,9 +54,18 @@ func TestGetFireBaseLogsUrl(t *testing.T) {
 
 	url := i.GetFireBaseLogsUrl()
 
-	assert.Equal(t, "https://xxxxx.firebase.com:443/logs", url, "Get URL from mocked storage")
+	assert.Equal(t, "https://xxxxx.firebase.com:443/logs", url, "")
 }
 
+func TestGetFireBaseSubscriptionsUrl(t *testing.T) {
+	EnvVarInitializer()
+
+	i := NewInitializer(NewEnvReader())
+
+	url := i.GetFireBaseSubscriptionsUrl()
+
+	assert.Equal(t, "https://xxxxx.firebase.com:443/subscriptions", url, "")
+}
 
 func TestGetTimerSeconds(t *testing.T) {
 	EnvVarInitializer()
@@ -64,5 +74,5 @@ func TestGetTimerSeconds(t *testing.T) {
 
 	seconds := i.GetTimerSeconds()
 
-	assert.Equal(t, 3600, seconds, "Get URL from mocked storage")
+	assert.Equal(t, 3600, seconds, "")
 }

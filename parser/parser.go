@@ -66,7 +66,7 @@ func (cm CommandsMatcher) ParseMessage(message Message) (bool, string) {
 	ok, f := cm.dispacher.GetActionFunc(splittedMessage[0])
 	if ok {
 
-		return ok, f(splittedMessage)
+		return ok, f(splittedMessage, message.ChatId)
 	}
 
 	return cm.delegate(message)

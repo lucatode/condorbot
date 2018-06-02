@@ -1,26 +1,26 @@
 package repositories
 
 import (
+	"condorbot/logger"
+	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"encoding/json"
-	"condorbot/logger"
 )
 
-type MatchCase struct{
+type MatchCase struct {
 	MatchExact bool
-	Request string
-	Response string
+	Request    string
+	Response   string
 }
 
-type Repository interface{
+type Repository interface {
 	GetExactMatchMap() map[string]string
 	GetWordMatchMap() map[string]string
 }
 
-type FireBaseRepository struct{
-	Delegate func (string) (*http.Response, error)
-	Logger logger.Logger
+type FireBaseRepository struct {
+	Delegate func(string) (*http.Response, error)
+	Logger   logger.Logger
 }
 
 func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
@@ -33,12 +33,12 @@ func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
 	var bytesArray []byte
 	if resp.StatusCode == http.StatusOK {
 		bytesArray, err = ioutil.ReadAll(resp.Body)
-		if err != nil{
+		if err != nil {
 			repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
 		}
 	}
 
-	if bytesArray != nil{
+	if bytesArray != nil {
 		var cases []MatchCase
 		json.Unmarshal(bytesArray, &cases)
 		return ExactMatchCasesToMap(cases)
@@ -57,12 +57,12 @@ func (repo FireBaseRepository) GetWordMatchMap(url string) map[string]string {
 	var bytesArray []byte
 	if resp.StatusCode == http.StatusOK {
 		bytesArray, err = ioutil.ReadAll(resp.Body)
-		if err != nil{
+		if err != nil {
 			repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
 		}
 	}
 
-	if bytesArray != nil{
+	if bytesArray != nil {
 		var cases []MatchCase
 		json.Unmarshal(bytesArray, &cases)
 		return WordMatchCasesToMap(cases)
@@ -71,10 +71,9 @@ func (repo FireBaseRepository) GetWordMatchMap(url string) map[string]string {
 	return nil
 }
 
-
-func ExactMatchCasesToMap(matchCases []MatchCase) map[string]string{
+func ExactMatchCasesToMap(matchCases []MatchCase) map[string]string {
 	dict := make(map[string]string)
-	for _,matchCase := range matchCases {
+	for _, matchCase := range matchCases {
 		if matchCase.MatchExact {
 			dict[matchCase.Request] = matchCase.Response
 		}
@@ -82,9 +81,9 @@ func ExactMatchCasesToMap(matchCases []MatchCase) map[string]string{
 	return dict
 }
 
-func WordMatchCasesToMap(matchCases []MatchCase) map[string]string{
+func WordMatchCasesToMap(matchCases []MatchCase) map[string]string {
 	dict := make(map[string]string)
-	for _,matchCase := range matchCases {
+	for _, matchCase := range matchCases {
 		if !matchCase.MatchExact {
 			dict[matchCase.Request] = matchCase.Response
 		}
