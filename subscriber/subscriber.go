@@ -7,14 +7,14 @@ import (
 )
 
 type Subscription struct {
-	channel string
-	chatId  string
+	Channel string
+	ChatId  string
 }
 
 func httpPost(url string, subscription Subscription) {
 	jsonStr, _ := json.Marshal(subscription)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-	req.Header.Set("X-Custom-Header", "log")
+	req.Header.Set("X-Custom-Header", "subscription")
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
@@ -30,7 +30,7 @@ func AddSubscription(url string, message []string, chatId string) string {
 	if len(message) == 3 {
 		channel := message[2]
 		s := Subscription{channel, chatId}
-		httpPost(url, s)
+		httpPost(url+"/"+channel+".json", s)
 		return "Subscribed this chat to channel " + channel
 	}
 	return "invalid message for subscribe channel"
