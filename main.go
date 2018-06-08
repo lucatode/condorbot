@@ -79,10 +79,14 @@ func main() {
 	logger := CreateLogger(init)
 	repo := CreateRepository(logger)
 
+	m := repo.GetWordMatchMap(init.GetFireBaseResponsesUrl())
+	for _, v := range m {
+		logger.Log("MAIN_INIT","request: "+v)
+	}
+
 	p := parser.CommandsDecorated(
 		BuildCommandDispatcher(init.GetFireBaseSubscriptionsUrl()),
-		parser.ContainsWordDecorated(
-			repo.GetWordMatchMap(init.GetFireBaseResponsesUrl()),
+		parser.ContainsWordDecorated(m,
 			parser.NewExactMatcher(
 				repo.GetExactMatchMap(init.GetFireBaseResponsesUrl()))))
 
