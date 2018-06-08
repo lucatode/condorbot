@@ -118,11 +118,11 @@ func main() {
 		}
 
 		ok, text := p.ParseMessage(BuildMessage(update.Message))
-		if ok {
-			logger.Log("MAIN", "Response found"+text)
-		}else{
-			logger.Log("MAIN", "Response not found, message was "+update.Message.Text)
-		}
+		//if ok {
+		//	logger.Log("MAIN", "Response found"+text)
+		//}else{
+		//	logger.Log("MAIN", "Response not found, message was "+update.Message.Text)
+		//}
 
 		if ok {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
