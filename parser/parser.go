@@ -62,6 +62,10 @@ type CommandsMatcher struct {
 
 func (cm CommandsMatcher) ParseMessage(message Message) (bool, string) {
 	inputString := message.Text
+	if !strings.Contains(inputString, "#") {
+		return cm.delegate(message)
+	}
+
 	splittedMessage := strings.Split(inputString, " ")
 	ok, f := cm.dispatcher.GetActionFunc(splittedMessage[0])
 	if ok {
