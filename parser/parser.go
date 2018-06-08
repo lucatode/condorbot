@@ -1,7 +1,7 @@
 package parser
 
 import (
-	"condorbot/dispacher"
+	"condorbot/dispatcher"
 	"strings"
 )
 
@@ -57,13 +57,13 @@ func ContainsWordDecorated(dict map[string]string, matcher Parser) Parser {
 
 type CommandsMatcher struct {
 	delegate  func(Message) (bool, string)
-	dispacher dispacher.Dispacher
+	dispatcher dispatcher.Dispatcher
 }
 
 func (cm CommandsMatcher) ParseMessage(message Message) (bool, string) {
 	inputString := message.Text
 	splittedMessage := strings.Split(inputString, " ")
-	ok, f := cm.dispacher.GetActionFunc(splittedMessage[0])
+	ok, f := cm.dispatcher.GetActionFunc(splittedMessage[0])
 	if ok {
 
 		return ok, f(splittedMessage, message.ChatId)
@@ -72,11 +72,11 @@ func (cm CommandsMatcher) ParseMessage(message Message) (bool, string) {
 	return cm.delegate(message)
 }
 
-func NewCommandsMatcher(dispacher dispacher.Dispacher) Parser {
+func NewCommandsMatcher(dispatcher dispatcher.Dispatcher) Parser {
 	delegate := func(input Message) (bool, string) { return false, "" }
-	return CommandsMatcher{delegate, dispacher}
+	return CommandsMatcher{delegate, dispatcher}
 }
 
-func CommandsDecorated(dispacher dispacher.Dispacher, matcher Parser) Parser {
-	return CommandsMatcher{matcher.ParseMessage, dispacher}
+func CommandsDecorated(dispatcher dispatcher.Dispatcher, matcher Parser) Parser {
+	return CommandsMatcher{matcher.ParseMessage, dispatcher}
 }

@@ -1,11 +1,9 @@
 package main
 
 import (
-	"condorbot/dispacher"
+	"condorbot/dispatcher"
 	"condorbot/initializer"
 	"condorbot/subscriber"
-	"encoding/json"
-	"io/ioutil"
 	"log"
 	"net/http"
 	"os"
@@ -14,9 +12,10 @@ import (
 	"condorbot/logger"
 	"condorbot/parser"
 	"condorbot/repositories"
-	"strings"
-
 	"gopkg.in/telegram-bot-api.v4"
+	"strings"
+	"io/ioutil"
+	"encoding/json"
 )
 
 func Init() initializer.Initializer {
@@ -34,10 +33,44 @@ func CreateRepository(logger logger.FirebaseLogger) repositories.FireBaseReposit
 func BuildMessage(message *tgbotapi.Message) parser.Message {
 	return parser.Message{message.Text, strconv.FormatInt(message.Chat.ID, 10)}
 }
-func BuildCommandDispacher(url string) dispacher.Dispacher {
-	return dispacher.CommandDispacher{map[string]func([]string, string) string{
+func BuildCommandDispatcher(url string) dispatcher.Dispatcher {
+	return dispatcher.CommandDispatcher{map[string]func([]string, string) string{
 		"#subscribe": func(split []string, chatId string) string { return subscriber.AddSubscription(url, split, chatId) },
 	}}
+}
+func NotifyHandler(init initializer.Initializer, bot *tgbotapi.BotAPI) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		channel := strings.TrimPrefix(r.URL.Path, "/notify/")
+		channelsToNotify := subscriber.GetChatIdForChannel(init.GetFireBaseSubscriptionsUrl(), channel)
+
+		type NotificationMessage struct {
+			Key string
+			Source  string
+			Message string
+		}
+
+		var mex NotificationMessage
+
+		if r.Method == "POST" {
+			body, err := ioutil.ReadAll(r.Body)
+			if err != nil {
+				http.Error(w, "Error reading request body",
+					http.StatusInternalServerError)
+			}
+
+			if body != nil {
+				json.Unmarshal(body, &mex)
+			}
+		}
+
+		if mex.Key == os.Getenv("SecuriyKey") {
+			for _, c := range channelsToNotify {
+				i, _ := strconv.ParseInt(c, 10, 64)
+				msg := tgbotapi.NewMessage(i, "["+mex.Source+"]: "+mex.Message)
+				bot.Send(msg)
+			}
+		}
+	}
 }
 
 func main() {
@@ -47,7 +80,7 @@ func main() {
 	repo := CreateRepository(logger)
 
 	p := parser.CommandsDecorated(
-		BuildCommandDispacher(init.GetFireBaseSubscriptionsUrl()),
+		BuildCommandDispatcher(init.GetFireBaseSubscriptionsUrl()),
 		parser.ContainsWordDecorated(
 			repo.GetWordMatchMap(init.GetFireBaseResponsesUrl()),
 			parser.NewExactMatcher(
@@ -89,37 +122,3 @@ func main() {
 	}
 }
 
-func NotifyHandler(init initializer.Initializer, bot *tgbotapi.BotAPI) func(w http.ResponseWriter, r *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
-		channel := strings.TrimPrefix(r.URL.Path, "/notify/")
-		channelsToNotify := subscriber.GetChatIdForChannel(init.GetFireBaseSubscriptionsUrl(), channel)
-
-		type NotificationMessage struct {
-			Key string
-			Source  string
-			Message string
-		}
-
-		var mex NotificationMessage
-
-		if r.Method == "POST" {
-			body, err := ioutil.ReadAll(r.Body)
-			if err != nil {
-				http.Error(w, "Error reading request body",
-					http.StatusInternalServerError)
-			}
-
-			if body != nil {
-				json.Unmarshal(body, &mex)
-			}
-		}
-
-		if mex.Key == os.Getenv("SecuriyKey") {
-			for _, c := range channelsToNotify {
-				i, _ := strconv.ParseInt(c, 10, 64)
-				msg := tgbotapi.NewMessage(i, "["+mex.Source+"]: "+mex.Message)
-				bot.Send(msg)
-			}
-		}
-	}
-}

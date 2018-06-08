@@ -1,10 +1,10 @@
 package parser
 
 import (
-	"condorbot/dispacher"
+	"condorbot/dispatcher"
 	"testing"
 
-	"githuB.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
 )
 
 func MockExactMatchDictionary() map[string]string {
@@ -21,8 +21,8 @@ func MockWordMatcherDictionary() map[string]string {
 	}
 }
 
-func MockDispacher() dispacher.Dispacher {
-	return dispacher.NewCommandDispacher(map[string]func([]string, string) string{
+func MockDispatcher() dispatcher.Dispatcher {
+	return dispatcher.NewCommandDispatcher(map[string]func([]string, string) string{
 		"#command": func([]string, string) string { return "command received" },
 		"#subscribe_2": func(params []string, chatId string) string {
 			msg := "subscribed"
@@ -41,7 +41,7 @@ var B = NewMessageBuilder()
 func TestExactMatchDecoratedWithCommand(t *testing.T) {
 
 	matcher := CommandsDecorated(
-		MockDispacher(),
+		MockDispatcher(),
 		NewExactMatcher(MockExactMatchDictionary()),
 	)
 
@@ -56,14 +56,14 @@ func TestExactMatchDecoratedWithCommand(t *testing.T) {
 
 func TestCheckCommandMatch(t *testing.T) {
 
-	matchOutput, stringOutput := NewCommandsMatcher(MockDispacher()).ParseMessage(B.WithText("#command").Build())
+	matchOutput, stringOutput := NewCommandsMatcher(MockDispatcher()).ParseMessage(B.WithText("#command").Build())
 	assert.Equal(t, stringOutput, "command received", "")
 	assert.Equal(t, matchOutput, true, "")
 }
 
 func TestCommandWithParameters(t *testing.T) {
 
-	matchOutput, stringOutput := NewCommandsMatcher(MockDispacher()).ParseMessage(B.WithText("#subscribe_2 channel xxxx").Build())
+	matchOutput, stringOutput := NewCommandsMatcher(MockDispatcher()).ParseMessage(B.WithText("#subscribe_2 channel xxxx").Build())
 	assert.Equal(t, stringOutput, "subscribed channel xxxx", "")
 	assert.Equal(t, matchOutput, true, "")
 }
