@@ -105,6 +105,26 @@ func TestExactMatchDecorated(t *testing.T) {
 	assert.Equal(t, matchOutput, true, "")
 }
 
+func TestWithAllDecorations(t *testing.T) {
+
+	matcher := CommandsDecorated(MockDispatcher(),ContainsWordDecorated(
+		MockWordMatcherDictionary(),
+		NewExactMatcher(MockExactMatchDictionary()),
+	))
+	matchOutput, stringOutput := matcher.ParseMessage(B.WithText("aaaa bccb").Build())
+	assert.Equal(t, "Found bccb", stringOutput, "")
+	assert.Equal(t, matchOutput, true, "")
+
+	matchOutput, stringOutput = matcher.ParseMessage(B.WithText("notify").Build())
+	assert.Equal(t, "notified", stringOutput, "")
+	assert.Equal(t, matchOutput, true, "")
+
+	matchOutput, stringOutput = matcher.ParseMessage(B.WithText("#command").Build())
+	assert.Equal(t, "command received", stringOutput, "")
+	assert.Equal(t, matchOutput, true, "")
+
+}
+
 //////////////////////////////////
 
 type Builder interface {

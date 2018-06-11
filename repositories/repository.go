@@ -30,17 +30,19 @@ func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
 	}
 	defer resp.Body.Close()
 
-	var bytesArray []byte
+	var byteArray []byte
 	if resp.StatusCode == http.StatusOK {
-		bytesArray, err = ioutil.ReadAll(resp.Body)
+		byteArray, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
 			repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
 		}
 	}
 
-	if bytesArray != nil {
+	if byteArray != nil {
 		var cases []MatchCase
-		json.Unmarshal(bytesArray, &cases)
+		s := string(byteArray)
+		repo.Logger.Log("REPO", "received "+s)
+		json.Unmarshal(byteArray, &cases)
 		return ExactMatchCasesToMap(cases)
 	}
 
