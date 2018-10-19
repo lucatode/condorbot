@@ -1,10 +1,7 @@
 package logger
 
 import (
-	"net/http"
-	"bytes"
 	"time"
-	"encoding/json"
 )
 
 type Log struct{
@@ -15,41 +12,45 @@ type Log struct{
 }
 
 type Logger interface{
-	Log(source string, message string)
-	Warn(source string, message string)
-	Err(source string, message string)
+	Log(source string, message string, f func (url string, log interface{}))
+	Warn(source string, message string, f func (url string, log interface{}))
+	Err(source string, message string, f func (url string, log interface{}))
 }
 
 type FirebaseLogger struct{
 	Url string
 }
 
-func HttpPost(url string, Log Log){
-	jsonStr, _ := json.Marshal(Log)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-	req.Header.Set("X-Custom-Header", "log")
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-}
-
-func (logger FirebaseLogger) Log(source string, message string) {
+func (logger FirebaseLogger) Log(source string, message string, f func (url string, log interface{})) {
 	l := Log { Source: source, Message: message, Level:"Info", Time:time.Now().String() }
-	HttpPost(logger.Url, l)
+	f(logger.Url, l)
 }
 
-func (logger FirebaseLogger) Warn(source string, message string) {
+func (logger FirebaseLogger) Warn(source string, message string, f func (url string, log interface{})) {
 	l := Log { Source: source, Message: message, Level:"Warning", Time:time.Now().String() }
-	HttpPost(logger.Url, l)
+	f(logger.Url, l)
 }
 
-func (logger FirebaseLogger) Err(source string, message string) {
+func (logger FirebaseLogger) Err(source string, message string, f func (url string, log interface{})) {
 	l := Log { Source: source, Message: message, Level:"Error", Time:time.Now().String() }
-	HttpPost(logger.Url, l)
+	f(logger.Url, l)
 }
 
+type PutLogger struct{
+	endPoint string
+}
+
+func (logger PutLogger) Log(source string, message string, f func (url string, log interface{})) {
+	l := Log { Source: source, Message: message, Level:"Info", Time:time.Now().String() }
+	f(logger.endPoint, l)
+}
+
+func (logger PutLogger) Warn(source string, message string, f func (url string, log interface{})) {
+	l := Log { Source: source, Message: message, Level:"Warning", Time:time.Now().String() }
+	f(logger.endPoint, l)
+}
+
+func (logger PutLogger) Err(source string, message string, f func (url string, log interface{})) {
+	l := Log { Source: source, Message: message, Level:"Error", Time:time.Now().String() }
+	f(logger.endPoint, l)
+}

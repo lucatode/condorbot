@@ -37,7 +37,7 @@ func AddSubscription(url string, message []string, chatId string) string {
 	return "invalid message for subscribe channel"
 }
 
-func GetChatIdForChannel(url string, channel string) []string {
+func GetChatIdsForChannel(url string, channel string) []string {
 	chatIds := []string{}
 	client := http.Client{}
 	resp, err := client.Get(url + "/" + channel + ".json")

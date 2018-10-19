@@ -41,7 +41,7 @@ func BuildCommandDispatcher(url string) dispatcher.Dispatcher {
 func NotifyHandler(init initializer.Initializer, bot *tgbotapi.BotAPI) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		channel := strings.TrimPrefix(r.URL.Path, "/notify/")
-		channelsToNotify := subscriber.GetChatIdForChannel(init.GetFireBaseSubscriptionsUrl(), channel)
+		channelsToNotify := subscriber.GetChatIdsForChannel(init.GetFireBaseSubscriptionsUrl(), channel)
 
 		type NotificationMessage struct {
 			Key string
