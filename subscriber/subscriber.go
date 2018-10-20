@@ -11,7 +11,7 @@ type Subscription struct {
 	ChatId  string
 }
 
-func AddSubscription(url string, message []string, chatId string, f func(url string, subscription Subscription) ) string {
+func AddSubscription(url string, message []string, chatId string, f func(url string, subscription interface{})) string {
 
 	if len(message) == 3 {
 		channel := message[2]

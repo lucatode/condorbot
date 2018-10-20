@@ -55,9 +55,8 @@ func ContainsWordDecorated(dict map[string]string, matcher Parser) Parser {
 	return ContainsWordMatcher{matcher.ParseMessage, dict}
 }
 
-
 type CommandsMatcher struct {
-	delegate  func(Message) (bool, string)
+	delegate   func(Message) (bool, string)
 	dispatcher dispatcher.Dispatcher
 }
 

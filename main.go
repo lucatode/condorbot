@@ -12,17 +12,18 @@ import (
 	"condorbot/logger"
 	"condorbot/parser"
 	"condorbot/repositories"
-	"gopkg.in/telegram-bot-api.v4"
-	"strings"
-	"io/ioutil"
+	"condorbot/utils"
 	"encoding/json"
+	"gopkg.in/telegram-bot-api.v4"
+	"io/ioutil"
+	"strings"
 )
 
 func Init() initializer.Initializer {
 	return initializer.NewInitializer(initializer.NewEnvReader())
 }
 func CreateLogger(init initializer.Initializer) logger.FirebaseLogger {
-	logger := logger.FirebaseLogger{init.GetFireBaseLogsUrl()}
+	logger := logger.FirebaseLogger{init.GetFireBaseLogsUrl(), utils.JsonPost}
 	logger.Log("MAIN", "Starting")
 	return logger
 }
@@ -35,7 +36,7 @@ func BuildMessage(message *tgbotapi.Message) parser.Message {
 }
 func BuildCommandDispatcher(url string) dispatcher.Dispatcher {
 	return dispatcher.CommandDispatcher{map[string]func([]string, string) string{
-		"#subscribe": func(split []string, chatId string) string { return subscriber.AddSubscription(url, split, chatId) },
+		"#subscribe": func(split []string, chatId string) string { return subscriber.AddSubscription(url, split, chatId, utils.JsonPost) },
 	}}
 }
 func NotifyHandler(init initializer.Initializer, bot *tgbotapi.BotAPI) func(w http.ResponseWriter, r *http.Request) {
@@ -44,7 +45,7 @@ func NotifyHandler(init initializer.Initializer, bot *tgbotapi.BotAPI) func(w ht
 		channelsToNotify := subscriber.GetChatIdsForChannel(init.GetFireBaseSubscriptionsUrl(), channel)
 
 		type NotificationMessage struct {
-			Key string
+			Key     string
 			Source  string
 			Message string
 		}
@@ -81,7 +82,7 @@ func main() {
 
 	m := repo.GetWordMatchMap(init.GetFireBaseResponsesUrl())
 	for _, v := range m {
-		logger.Log("MAIN_INIT","request: "+v)
+		logger.Log("MAIN_INIT", "request: "+v)
 	}
 
 	p := parser.CommandsDecorated(
@@ -124,4 +125,3 @@ func main() {
 		}
 	}
 }
-

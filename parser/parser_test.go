@@ -107,7 +107,7 @@ func TestExactMatchDecorated(t *testing.T) {
 
 func TestWithAllDecorations(t *testing.T) {
 
-	matcher := CommandsDecorated(MockDispatcher(),ContainsWordDecorated(
+	matcher := CommandsDecorated(MockDispatcher(), ContainsWordDecorated(
 		MockWordMatcherDictionary(),
 		NewExactMatcher(MockExactMatchDictionary()),
 	))

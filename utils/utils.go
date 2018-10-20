@@ -6,7 +6,7 @@ import (
 	"net/http"
 )
 
-func JsonPost(url string, object interface{}){
+func JsonPost(url string, object interface{}) {
 	jsonStr, _ := json.Marshal(object)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 

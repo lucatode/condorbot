@@ -1,13 +1,11 @@
 package repositories
 
 import (
-	"github.com/stretchr/testify/assert"
-	"testing"
-	"net/http"
 	"condorbot/logger"
+	"github.com/stretchr/testify/assert"
+	"net/http"
+	"testing"
 )
-
-
 
 func TestCheckStringMatch(t *testing.T) {
 	client := http.Client{}
