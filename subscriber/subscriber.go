@@ -1,7 +1,6 @@
 package subscriber
 
 import (
-	"bytes"
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
@@ -12,26 +11,12 @@ type Subscription struct {
 	ChatId  string
 }
 
-func httpPost(url string, subscription Subscription) {
-	jsonStr, _ := json.Marshal(subscription)
-	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
-	req.Header.Set("X-Custom-Header", "subscription")
-	req.Header.Set("Content-Type", "application/json")
-
-	client := &http.Client{}
-	resp, err := client.Do(req)
-	if err != nil {
-		panic(err)
-	}
-	defer resp.Body.Close()
-}
-
-func AddSubscription(url string, message []string, chatId string) string {
+func AddSubscription(url string, message []string, chatId string, f func(url string, subscription Subscription) ) string {
 
 	if len(message) == 3 {
 		channel := message[2]
 		s := Subscription{channel, chatId}
-		httpPost(url+"/"+channel+".json", s)
+		f(url+"/"+channel+".json", s)
 		return "Subscribed this chat to channel " + channel
 	}
 	return "invalid message for subscribe channel"

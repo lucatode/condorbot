@@ -6,11 +6,11 @@ import (
 	"net/http"
 )
 
-func JsonPost(url string, log interface{}){
-	jsonStr, _ := json.Marshal(log)
+func JsonPost(url string, object interface{}){
+	jsonStr, _ := json.Marshal(object)
 	req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr))
 
-	req.Header.Set("X-Custom-Header", "log")
+	req.Header.Set("X-Custom-Header", "object")
 	req.Header.Set("Content-Type", "application/json")
 
 	client := &http.Client{}
