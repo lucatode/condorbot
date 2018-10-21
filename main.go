@@ -22,12 +22,12 @@ import (
 func Init() initializer.Initializer {
 	return initializer.NewInitializer(initializer.NewEnvReader())
 }
-func CreateLogger(init initializer.Initializer) logger.FirebaseLogger {
-	logger := logger.FirebaseLogger{init.GetFireBaseLogsUrl(), utils.JsonPost}
+func CreateLogger(init initializer.Initializer) logger.PutLogger {
+	logger := logger.PutLogger{init.GetLoggerServiceUri(), utils.JsonPost}
 	logger.Log("MAIN", "Starting")
 	return logger
 }
-func CreateRepository(logger logger.FirebaseLogger) repositories.FireBaseRepository {
+func CreateRepository(logger logger.PutLogger) repositories.FireBaseRepository {
 	client := http.Client{}
 	return repositories.FireBaseRepository{client.Get, logger}
 }

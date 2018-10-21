@@ -16,7 +16,7 @@ func TestPutLogger_Log(t *testing.T) {
 	logger.Log("TEST_SUITE", "This is a log message")
 }
 
-func TestFirebaseLogger_Warn(t *testing.T) {
+func TestPutLogger_Warn(t *testing.T) {
 
 }
 
