@@ -28,7 +28,7 @@ func GetChatIdsForChannel(url string, channel string) []string {
 	resp, err := client.Get(url + "/" + channel + ".json")
 
 	if err != nil {
-		//repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
+		//repo.logger.Err("ConfigRepository", "First err: "+err.Error())
 	}
 	defer resp.Body.Close()
 
@@ -36,7 +36,7 @@ func GetChatIdsForChannel(url string, channel string) []string {
 	if resp.StatusCode == http.StatusOK {
 		bytesArray, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
-			//repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
+			//repo.logger.Err("ConfigRepository", "First err: "+err.Error())
 		}
 	}
 

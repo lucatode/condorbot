@@ -18,15 +18,15 @@ type Repository interface {
 	GetWordMatchMap() map[string]string
 }
 
-type FireBaseRepository struct {
+type ConfigRepository struct {
 	Delegate func(string) (*http.Response, error)
-	Logger   logger.Logger
+	logger   logger.Logger
 }
 
-func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
+func (repo ConfigRepository) GetExactMatchMap(url string) map[string]string {
 	resp, err := repo.Delegate(url)
 	if err != nil {
-		repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
+		repo.logger.Err("ConfigRepository", "First err: "+err.Error())
 	}
 	defer resp.Body.Close()
 
@@ -34,25 +34,25 @@ func (repo FireBaseRepository) GetExactMatchMap(url string) map[string]string {
 	if resp.StatusCode == http.StatusOK {
 		byteArray, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
-			repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
+			repo.logger.Err("ConfigRepository", "First err: "+err.Error())
 		}
 	}
 
 	if byteArray != nil {
 		var cases []MatchCase
 		s := string(byteArray)
-		repo.Logger.Log("REPO", "received "+s)
+		repo.logger.Log("REPO", "received "+s)
 		json.Unmarshal(byteArray, &cases)
-		return ExactMatchCasesToMap(cases)
+		return exactMatchCasesToMap(cases)
 	}
 
 	return nil
 }
 
-func (repo FireBaseRepository) GetWordMatchMap(url string) map[string]string {
+func (repo ConfigRepository) GetWordMatchMap(url string) map[string]string {
 	resp, err := repo.Delegate(url)
 	if err != nil {
-		repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
+		repo.logger.Err("ConfigRepository", "First err: "+err.Error())
 	}
 	defer resp.Body.Close()
 
@@ -60,20 +60,20 @@ func (repo FireBaseRepository) GetWordMatchMap(url string) map[string]string {
 	if resp.StatusCode == http.StatusOK {
 		bytesArray, err = ioutil.ReadAll(resp.Body)
 		if err != nil {
-			repo.Logger.Err("FireBaseRepository", "First err: "+err.Error())
+			repo.logger.Err("ConfigRepository", "First err: "+err.Error())
 		}
 	}
 
 	if bytesArray != nil {
 		var cases []MatchCase
 		json.Unmarshal(bytesArray, &cases)
-		return WordMatchCasesToMap(cases)
+		return wordMatchCasesToMap(cases)
 	}
 
 	return nil
 }
 
-func ExactMatchCasesToMap(matchCases []MatchCase) map[string]string {
+func exactMatchCasesToMap(matchCases []MatchCase) map[string]string {
 	dict := make(map[string]string)
 	for _, matchCase := range matchCases {
 		if matchCase.MatchExact {
@@ -83,7 +83,7 @@ func ExactMatchCasesToMap(matchCases []MatchCase) map[string]string {
 	return dict
 }
 
-func WordMatchCasesToMap(matchCases []MatchCase) map[string]string {
+func wordMatchCasesToMap(matchCases []MatchCase) map[string]string {
 	dict := make(map[string]string)
 	for _, matchCase := range matchCases {
 		if !matchCase.MatchExact {

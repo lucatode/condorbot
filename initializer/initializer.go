@@ -15,9 +15,9 @@ type Initializer interface {
 	GetApiToken() string
 	GetServerUrl() string
 	GetTimerSeconds() int
-	GetFireBaseResponsesUrl() string
+	GetConfigResponsesUrl() string
 	GetLoggerServiceUri() string
-	GetFireBaseSubscriptionsUrl() string
+	GetConfigSubscriptionsUrl() string
 }
 
 type ParameterInitializer struct {
@@ -25,7 +25,7 @@ type ParameterInitializer struct {
 }
 
 func (init ParameterInitializer) GetLoggerServiceUri() string {
-	return init.storage.GetData()["FireBaseLogsUrl"]
+	return init.storage.GetData()["ConfigLogsUrl"]
 }
 
 func (init ParameterInitializer) GetApiToken() string {
@@ -41,12 +41,12 @@ func (init ParameterInitializer) GetTimerSeconds() int {
 	return ret
 }
 
-func (init ParameterInitializer) GetFireBaseResponsesUrl() string {
-	return init.storage.GetData()["FireBaseResponsesUrl"]
+func (init ParameterInitializer) GetConfigResponsesUrl() string {
+	return init.storage.GetData()["ConfigResponsesUrl"]
 }
 
-func (init ParameterInitializer) GetFireBaseSubscriptionsUrl() string {
-	return init.storage.GetData()["FireBaseSubscriptionsUrl"]
+func (init ParameterInitializer) GetConfigSubscriptionsUrl() string {
+	return init.storage.GetData()["ConfigSubscriptionsUrl"]
 }
 
 //--- Initializer Storage
@@ -69,7 +69,7 @@ func (storage EnvStorage) GetData() map[string]string {
 		"ServerUrl":                os.Getenv("ServerUrl"),
 		"TimerSeconds":             os.Getenv("TimerSeconds"),
 		"LoggerServiceUri":          os.Getenv("LoggerServiceUri"),
-		"FireBaseResponsesUrl":     os.Getenv("FireBaseResponsesUrl"),
-		"FireBaseSubscriptionsUrl": os.Getenv("FireBaseSubscriptionsUrl"),
+		"ConfigResponsesUrl":     os.Getenv("ConfigResponsesUrl"),
+		"ConfigSubscriptionsUrl": os.Getenv("ConfigSubscriptionsUrl"),
 	}
 }

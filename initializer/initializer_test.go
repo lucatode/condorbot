@@ -11,9 +11,9 @@ func EnvVarInitializer() {
 	os.Setenv("ApiToken", "ABCD012345678")
 	os.Setenv("ServerUrl", "https://xxxxx.yyyyyy.com:443/")
 	os.Setenv("TimerSeconds", "3600")
-	os.Setenv("FireBaseResponsesUrl", "https://xxxxx.firebase.com:443/")
-	os.Setenv("FireBaseLogsUrl", "https://xxxxx.firebase.com:443/logs")
-	os.Setenv("FireBaseSubscriptionsUrl", "https://xxxxx.firebase.com:443/subscriptions")
+	os.Setenv("ConfigResponsesUrl", "https://xxxxx.Config.com:443/")
+	os.Setenv("ConfigLogsUrl", "https://xxxxx.Config.com:443/logs")
+	os.Setenv("ConfigSubscriptionsUrl", "https://xxxxx.Config.com:443/subscriptions")
 }
 
 func TestGetAPITocken(t *testing.T) {
@@ -37,34 +37,34 @@ func TestGetServerUrl(t *testing.T) {
 	assert.Equal(t, "https://xxxxx.yyyyyy.com:443/", url, "")
 }
 
-func TestGetFireBaseResponsesUrl(t *testing.T) {
+func TestGetConfigResponsesUrl(t *testing.T) {
 	EnvVarInitializer()
 
 	i := NewInitializer(NewEnvReader())
 
-	url := i.GetFireBaseResponsesUrl()
+	url := i.GetConfigResponsesUrl()
 
-	assert.Equal(t, "https://xxxxx.firebase.com:443/", url, "")
+	assert.Equal(t, "https://xxxxx.Config.com:443/", url, "")
 }
 
-func TestGetFireBaseLogsUrl(t *testing.T) {
+func TestGetConfigLogsUrl(t *testing.T) {
 	EnvVarInitializer()
 
 	i := NewInitializer(NewEnvReader())
 
-	url := i.GetFireBaseLogsUrl()
+	url := i.GetLoggerServiceUri()
 
-	assert.Equal(t, "https://xxxxx.firebase.com:443/logs", url, "")
+	assert.Equal(t, "https://xxxxx.Config.com:443/logs", url, "")
 }
 
-func TestGetFireBaseSubscriptionsUrl(t *testing.T) {
+func TestGetConfigSubscriptionsUrl(t *testing.T) {
 	EnvVarInitializer()
 
 	i := NewInitializer(NewEnvReader())
 
-	url := i.GetFireBaseSubscriptionsUrl()
+	url := i.GetConfigSubscriptionsUrl()
 
-	assert.Equal(t, "https://xxxxx.firebase.com:443/subscriptions", url, "")
+	assert.Equal(t, "https://xxxxx.Config.com:443/subscriptions", url, "")
 }
 
 func TestGetTimerSeconds(t *testing.T) {

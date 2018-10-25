@@ -27,9 +27,9 @@ func CreateLogger(init initializer.Initializer) logger.PutLogger {
 	logger.Log("MAIN", "Starting")
 	return logger
 }
-func CreateRepository(logger logger.PutLogger) repositories.FireBaseRepository {
+func CreateRepository(logger logger.PutLogger) repositories.ConfigRepository {
 	client := http.Client{}
-	return repositories.FireBaseRepository{client.Get, logger}
+	return repositories.ConfigRepository{client.Get, logger}
 }
 func BuildMessage(message *tgbotapi.Message) parser.Message {
 	return parser.Message{message.Text, strconv.FormatInt(message.Chat.ID, 10)}
@@ -42,7 +42,7 @@ func BuildCommandDispatcher(url string) dispatcher.Dispatcher {
 func NotifyHandler(init initializer.Initializer, bot *tgbotapi.BotAPI) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
 		channel := strings.TrimPrefix(r.URL.Path, "/notify/")
-		channelsToNotify := subscriber.GetChatIdsForChannel(init.GetFireBaseSubscriptionsUrl(), channel)
+		channelsToNotify := subscriber.GetChatIdsForChannel(init.GetConfigSubscriptionsUrl(), channel)
 
 		type NotificationMessage struct {
 			Key     string
@@ -80,16 +80,16 @@ func main() {
 	logger := CreateLogger(init)
 	repo := CreateRepository(logger)
 
-	m := repo.GetWordMatchMap(init.GetFireBaseResponsesUrl())
+	m := repo.GetWordMatchMap(init.GetConfigResponsesUrl())
 	for _, v := range m {
 		logger.Log("MAIN_INIT", "request: "+v)
 	}
 
-	p := parser.CommandsDecorated(
-		BuildCommandDispatcher(init.GetFireBaseSubscriptionsUrl()),
+	parsr := parser.CommandsDecorated(
+		BuildCommandDispatcher(init.GetConfigSubscriptionsUrl()),
 		parser.ContainsWordDecorated(m,
 			parser.NewExactMatcher(
-				repo.GetExactMatchMap(init.GetFireBaseResponsesUrl()))))
+				repo.GetExactMatchMap(init.GetConfigResponsesUrl()))))
 
 	// SETUP BOT
 	bot, err := tgbotapi.NewBotAPI(init.GetApiToken())
@@ -107,7 +107,6 @@ func main() {
 	port := os.Getenv("PORT")
 	logger.Log("MAIN", "port: "+port)
 	go http.ListenAndServe(":"+port, nil)
-
 	http.HandleFunc("/notify/", NotifyHandler(init, bot))
 
 	// FETCH MESSAGES
@@ -117,7 +116,7 @@ func main() {
 			continue
 		}
 
-		ok, text := p.ParseMessage(BuildMessage(update.Message))
+		ok, text := parsr.ParseMessage(BuildMessage(update.Message))
 
 		if ok {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
