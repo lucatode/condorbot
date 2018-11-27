@@ -79,13 +79,8 @@ func main() {
 	init := Init()
 	logger := CreateLogger(init)
 	repo := CreateRepository(logger)
-
 	m := repo.GetWordMatchMap(init.GetConfigResponsesUrl())
-	for _, v := range m {
-		logger.Log("MAIN_INIT", "request: "+v)
-	}
-
-	parsr := parser.CommandsDecorated(
+	p := parser.CommandsDecorated(
 		BuildCommandDispatcher(init.GetConfigSubscriptionsUrl()),
 		parser.ContainsWordDecorated(m,
 			parser.NewExactMatcher(
@@ -116,8 +111,7 @@ func main() {
 			continue
 		}
 
-		ok, text := parsr.ParseMessage(BuildMessage(update.Message))
-
+		ok, text := p.ParseMessage(BuildMessage(update.Message))
 		if ok {
 			msg := tgbotapi.NewMessage(update.Message.Chat.ID, text)
 			bot.Send(msg)

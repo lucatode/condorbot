@@ -68,8 +68,8 @@ func (storage EnvStorage) GetData() map[string]string {
 		"ApiToken":                 os.Getenv("ApiToken"),
 		"ServerUrl":                os.Getenv("ServerUrl"),
 		"TimerSeconds":             os.Getenv("TimerSeconds"),
-		"LoggerServiceUri":          os.Getenv("LoggerServiceUri"),
-		"ConfigResponsesUrl":     os.Getenv("ConfigResponsesUrl"),
-		"ConfigSubscriptionsUrl": os.Getenv("ConfigSubscriptionsUrl"),
+		"ConfigLogsUrl":         os.Getenv("ConfigLogsUrl"),
+		"ConfigResponsesUrl":     	os.Getenv("ConfigResponsesUrl"),
+		"ConfigSubscriptionsUrl": 	os.Getenv("ConfigSubscriptionsUrl"),
 	}
 }

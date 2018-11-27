@@ -16,7 +16,7 @@ func EnvVarInitializer() {
 	os.Setenv("ConfigSubscriptionsUrl", "https://xxxxx.Config.com:443/subscriptions")
 }
 
-func TestGetAPITocken(t *testing.T) {
+func TestGetAPIToken(t *testing.T) {
 
 	EnvVarInitializer()
 
